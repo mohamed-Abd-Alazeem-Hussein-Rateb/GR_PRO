@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:grow/features/Home/presentation/views/widgets/Home_view_body.dart';
 
 class HomeView extends StatelessWidget {
   const HomeView({super.key});
@@ -6,9 +7,7 @@ class HomeView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Center(
-        child: Text('Home View'),
-      ),
+      body: HomeViewBody(),
     );
   }
 }
