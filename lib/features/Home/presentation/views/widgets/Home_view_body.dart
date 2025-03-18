@@ -49,7 +49,7 @@ class HomeViewBody extends StatelessWidget {
                           color: Color(0xffCCEADA),
                           child: Center(
                             child: Text(
-                              'corn',
+                              'corns',
                               style: TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.bold,
