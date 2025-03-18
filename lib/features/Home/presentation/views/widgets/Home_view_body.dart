@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:grow/features/Home/presentation/views/widgets/detalis_screen_apple.dart';
 import 'package:grow/features/Home/presentation/views/widgets/detalis_screen_bananas.dart';
 import 'package:grow/features/Home/presentation/views/widgets/detalis_screen_rice.dart';
 import 'package:grow/features/Home/presentation/views/widgets/detalis_screen_corn.dart';
-import 'package:grow/features/Home/presentation/views/widgets/lib/features/Home/presentation/views/widgets/detalis_screen_apple.dart';
 import 'package:grow/features/Home/presentation/views/widgets/weather_body.dart';
 
 class HomeViewBody extends StatelessWidget {
