@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:device_preview/device_preview.dart';
-import 'package:grow/features/dashboard/presentation/views/dashboard_view.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:grow/features/Home/data/service.dart';
+import 'package:grow/features/Home/presentation/manage/cubit/cubits_cubit.dart';
 import 'package:grow/features/splach/presentation/views/splach_view.dart';
 
 void main() {
@@ -17,12 +19,13 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      builder: DevicePreview.appBuilder, // ربط التطبيق بـ DevicePreview
-      debugShowCheckedModeBanner: false, // إخفاء شريط الـ debug
-      home:SplachView(),
+    return BlocProvider(
+      create: (context) => WeatherCubit(WeatherService())..getWeather(), // ✅ تعديل هنا
+      child: MaterialApp(
+        builder: DevicePreview.appBuilder,
+        debugShowCheckedModeBanner: false,
+        home: SplachView(),
+      ),
     );
   }
 }
-
-
