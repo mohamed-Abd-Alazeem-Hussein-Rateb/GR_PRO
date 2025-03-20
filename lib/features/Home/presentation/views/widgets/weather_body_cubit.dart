@@ -35,33 +35,35 @@ class WeatherBodyCubit extends StatelessWidget {
                   Positioned(
                     bottom: 30,
                     left: 20,
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min, // ✅ يمنع تمدد الـ Row
-                      children: [
-                        Text(
-                          '${weather.country}',
-                          style: TextStyle(
-                            fontSize: 16,
-                            color: Colors.white70,
+                    child: SizedBox(
+                      width:300,
+                      child: Row(
+                        children: [
+                          Text(
+                            '${weather.country}',
+                            style: TextStyle(
+                              fontSize: 16,
+                              color: Colors.white70,
+                            ),
                           ),
-                        ),
-
-                        Text(
-                          ',${weather.city}',
-                          style: TextStyle(
-                            fontSize: 16,
-                            color: Colors.white70,
+                      
+                          Text(
+                            ',${weather.city}',
+                            style: TextStyle(
+                              fontSize: 16,
+                              color: Colors.white70,
+                            ),
                           ),
-                        ),
-                        SizedBox(width: 136), // ✅ مسافة بين النصوص
-                        Text(
-                          '${weather.description}',
-                          style: TextStyle(
-                            fontSize: 14,
-                            color: Colors.white70,
+                          Spacer(),
+                          Text(
+                            '${weather.description}',
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: Colors.white70,
+                            ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                   ),
                 ],

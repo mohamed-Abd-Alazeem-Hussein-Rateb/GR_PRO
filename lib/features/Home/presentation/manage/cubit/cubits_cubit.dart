@@ -14,7 +14,6 @@ class WeatherCubit extends Cubit<CubitsState> {
     try {
       final weather = await weatherservice.getWeatherByLocation();
       if (weather != null) {
-         print("✅ بيانات الطقس المستلمة: ${weather.toString()}");
         emit(WeatherLoaded(weather));
       } else {
         // Handle the case where weather is null

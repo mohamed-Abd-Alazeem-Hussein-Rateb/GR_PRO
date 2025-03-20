@@ -17,7 +17,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   final List<Widget> _pages = [
     HomeView(),
-    WaterRequierd(),  // تم إضافة شاشة العربة هنا
+    WaterRequired(),  // تم إضافة شاشة العربة هنا
     ChatView(),
     Reqomendation(),
     ProfielView()

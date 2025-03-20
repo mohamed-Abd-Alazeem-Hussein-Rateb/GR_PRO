@@ -46,10 +46,8 @@ class WeatherService {
           'https://api.openweathermap.org/data/2.5/weather?lat=$latitude&lon=$longitude&appid=9fc868456ce31966cb9564283db15c34&units=metric',
         ),
       );
-       print("✅ بيانات الطقس المستلمة: ${response.body}");
       if (response.statusCode == 200) {
         final Map<String, dynamic> data = json.decode(response.body);
-        print("✅ بيانات الطقس: $data");
         return WeatherModel.fromJson(data);
       } else {
         print("❌ خطأ في الطلب: ${response.statusCode}");
