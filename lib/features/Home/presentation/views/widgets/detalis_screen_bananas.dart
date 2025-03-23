@@ -12,7 +12,7 @@ class DetalisScreenBananas extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const SizedBox(height: 10),
+              const SizedBox(height: 25),
               // أيقونة الرجوع
               InkWell(
                 onTap: () => Navigator.pop(context),

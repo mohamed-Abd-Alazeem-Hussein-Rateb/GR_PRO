@@ -4,7 +4,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:http/http.dart' as http;
+import 'package:dio/dio.dart';
 
 class WaterRequired extends StatefulWidget {
   const WaterRequired({super.key});
@@ -21,6 +21,7 @@ class _WaterRequiredState extends State<WaterRequired> {
   bool isLoading = false;
   TextEditingController cityController = TextEditingController();
   Position? currentPosition;
+  final Dio dio = Dio();
 
   final List<String> cropTypes = [
     'BANANA',
@@ -93,32 +94,47 @@ class _WaterRequiredState extends State<WaterRequired> {
         requestData['longitude'] = currentPosition!.longitude;
       }
 
-      final response = await http
-          .post(
-            Uri.parse('http://192.168.1.2:5000/predict'),
-            headers: {'Content-Type': 'application/json'},
-            body: json.encode(requestData),
-          )
-          .timeout(const Duration(seconds: 15));
+      final response = await dio.post(
+        'http://192.168.1.3:5000/predict',
+        data: jsonEncode(requestData),
+        options: Options(
+          headers: {'Content-Type': 'application/json'},
+          sendTimeout: const Duration(seconds: 15),
+          receiveTimeout: const Duration(seconds: 15),
+        ),
+      );
 
-      final responseBody = json.decode(response.body);
+      final responseBody = response.data;
 
       if (response.statusCode == 200) {
         setState(() {
           waterRequired = responseBody['water_required'];
-          locationName = responseBody['location'] ?? 'Unknown location';
+          locationName = responseBody['location'] ?? 'موقع غير معروف';
         });
       } else {
-        final errorMessage =
-            responseBody['message'] ?? 'Unknown error occurred';
+        final errorMessage = responseBody['error'] ?? 'حدث خطأ غير متوقع';
         throw errorMessage;
       }
-    } on SocketException {
-      _showErrorDialog('لا يوجد اتصال بالإنترنت');
-    } on TimeoutException {
-      _showErrorDialog('انتهى وقت الانتظار');
-    } on http.ClientException catch (e) {
-      _showErrorDialog('خطأ في الاتصال: ${e.message}');
+    } on DioException catch (e) {
+      String message;
+      switch (e.type) {
+        case DioExceptionType.connectionTimeout:
+        case DioExceptionType.receiveTimeout:
+        case DioExceptionType.sendTimeout:
+          message = 'انتهى وقت الانتظار';
+          break;
+        case DioExceptionType.connectionError:
+          message = 'لا يوجد اتصال بالإنترنت';
+          break;
+        case DioExceptionType.badResponse:
+          final errorData = e.response?.data as Map<String, dynamic>?;
+          final serverError = errorData?['error']?.toString() ?? 'خطأ غير معروف';
+          message = _translateError(serverError);
+          break;
+        default:
+          message = 'خطأ في الاتصال: ${e.message}';
+      }
+      _showErrorDialog(message);
     } catch (e) {
       _showErrorDialog(_translateError(e.toString()));
     } finally {
@@ -144,18 +160,21 @@ class _WaterRequiredState extends State<WaterRequired> {
 
   String _translateError(String error) {
     final translations = {
-      'City not found': 'المدينة غير موجودة',
-      'Invalid city data': 'بيانات المدينة غير صالحة',
-      'Failed to fetch weather data': 'فشل في جلب بيانات الطقس',
-      'Internal server error': 'خطأ في الخادم',
-      'Missing required fields': 'الحقول المطلوبة مفقودة',
-      'Invalid selection': 'اختيار غير صالح',
-      'city not found': 'المدينة غير موجودة', // إضافة ترجمة جديدة
-      'No data provided': 'لم يتم تقديم بيانات',
-      'Missing coordinates': 'الإحداثيات مفقودة',
+      'city not found': 'المدينة غير موجودة',
+      'invalid api key': 'مفتاح API غير صالح',
+      'nothing to geocode': 'اسم المدينة فارغ',
+      'internal server error': 'خطأ داخلي في الخادم',
+      'failed to fetch weather data': 'فشل في جلب بيانات الطقس',
+      'missing required fields': 'الحقول المطلوبة مفقودة',
+      'invalid selection': 'اختيار غير صالح',
+      'no data provided': 'لم يتم تقديم بيانات',
+      'missing coordinates': 'الإحداثيات مفقودة',
+      'بيانات المدينة غير صحيحة': 'بيانات المدينة غير صحيحة',
+      'فشل في الاتصال بالخادم': 'فشل في الاتصال بالخادم',
     };
 
-    return translations[error] ?? error;
+    final lowerError = error.toLowerCase();
+    return translations[lowerError] ?? error;
   }
 
   @override

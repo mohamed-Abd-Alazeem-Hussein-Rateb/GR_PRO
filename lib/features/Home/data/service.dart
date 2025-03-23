@@ -1,16 +1,16 @@
 import 'dart:convert';
-
+import 'package:dio/dio.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:grow/features/Home/data/modle/weather_modle.dart';
-import 'package:http/http.dart' as http;
 
 class WeatherService {
+  final Dio _dio = Dio();
+
   Future<WeatherModel?> getWeatherByLocation() async {
     try {
-      // 1️⃣ التحقق من أذونات الموقع
       bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
       if (!serviceEnabled) {
-        print("⚠️ خدمة الموقع غير مفعلة!");
+        print("\u26A0\uFE0F خدمة الموقع غير مفعلة!");
         return null;
       }
 
@@ -18,39 +18,41 @@ class WeatherService {
       if (permission == LocationPermission.denied) {
         permission = await Geolocator.requestPermission();
         if (permission == LocationPermission.denied) {
-          print("⚠️ تم رفض إذن الموقع!");
+          print("\u26A0\uFE0F تم رفض إذن الموقع!");
           return null;
         }
       }
 
       if (permission == LocationPermission.deniedForever) {
-        print("🚨 الإذن مرفوض بشكل دائم!");
+        print("\uD83D\uDEA8 الإذن مرفوض بشكل دائم!");
         return null;
       }
 
-      // 2️⃣ الحصول على الموقع الحالي باستخدام settings
       Position position = await Geolocator.getCurrentPosition(
         locationSettings: LocationSettings(
-          accuracy: LocationAccuracy.high, // دقة عالية
+          accuracy: LocationAccuracy.high,
         ),
       );
 
       double latitude = position.latitude;
       double longitude = position.longitude;
 
-      print("📍 الموقع: ($latitude, $longitude)");
+      print("\uD83D\uDCCD الموقع: ($latitude, $longitude)");
 
-      // 3️⃣ طلب بيانات الطقس بناءً على الإحداثيات
-      final response = await http.get(
-        Uri.parse(
-          'https://api.openweathermap.org/data/2.5/weather?lat=$latitude&lon=$longitude&appid=9fc868456ce31966cb9564283db15c34&units=metric',
-        ),
+      final response = await _dio.get(
+        'https://api.openweathermap.org/data/2.5/weather',
+        queryParameters: {
+          'lat': latitude,
+          'lon': longitude,
+          'appid': '9fc868456ce31966cb9564283db15c34',
+          'units': 'metric',
+        },
       );
+
       if (response.statusCode == 200) {
-        final Map<String, dynamic> data = json.decode(response.body);
-        return WeatherModel.fromJson(data);
+        return WeatherModel.fromJson(response.data);
       } else {
-        print("❌ خطأ في الطلب: ${response.statusCode}");
+        print("❌ خطأ في الاستجابة: ${response.statusCode}");
         return null;
       }
     } catch (e) {
